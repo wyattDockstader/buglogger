@@ -2,7 +2,7 @@ import { dbContext } from '../db/DbContext'
 
 class NotesService {
   async getNotesByBugId(id) {
-    const notes = await dbContext.Note.find({ }).populate('creator', 'name picture')
+    const notes = await dbContext.Note.find({ bug: id }).populate('creator', 'name picture')
     return notes
   }
 
