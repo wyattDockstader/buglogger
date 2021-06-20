@@ -8,13 +8,13 @@ class NotesService {
 
   async createNote(newNote) {
     const note = await dbContext.Note.create(newNote)
-    await note.populate('creator', 'name picture')
+    await note.populate('creator', 'name picture').execPopulate()
     return note
   }
 
   async editNote(id, newNote) {
     const note = await dbContext.Note.findByIdAndUpdate(id, newNote)
-    await note.populate('creator', 'name picture')
+    await note.populate('creator', 'name picture').execPopulate()
     return note
   }
 

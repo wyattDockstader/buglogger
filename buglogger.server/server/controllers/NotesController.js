@@ -1,5 +1,6 @@
 import { Auth0Provider } from '@bcwdev/auth0provider'
 import { notesService } from '../services/NotesService'
+import { bugsService } from '../services/BugsService'
 import BaseController from '../utils/BaseController'
 
 export class NotesController extends BaseController {
@@ -28,8 +29,11 @@ export class NotesController extends BaseController {
   async createNote(req, res, next) {
     req.body.creatorId = req.account.id
     try {
-      const note = await notesService.createNote(req.body)
-      return res.send(note)
+      const bug = await bugsService.getBugById(req.body.bug)
+      if (bug.closed === false) {
+        const note = await notesService.createNote(req.body)
+        return res.send(note)
+      }
     } catch (error) {
       next(error)
     }
