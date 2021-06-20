@@ -3,6 +3,7 @@ import { router } from '../router'
 import { logger } from '../utils/Logger'
 import Notification from '../utils/Notification'
 import { api } from './AxiosService'
+import { notesService } from './NotesService'
 
 class BugsService {
   async getBugs() {
@@ -28,6 +29,8 @@ class BugsService {
     try {
       const res = await api.get('api/bugs/' + id)
       AppState.activeBug = res.data
+      await notesService.getNotesByBugId(id)
+      await router.push({ name: 'BugDetailsPage', params: { id: res.data.id } })
       logger.log(AppState.activeBug, 'this is the active bug')
     } catch (error) {
       Notification.toast(error, 'couldnt get your bugs')

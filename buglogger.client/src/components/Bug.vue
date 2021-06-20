@@ -1,5 +1,5 @@
 <template>
-  <tr @click="$router.push({ name: 'BugDetailsPage', params: { id: bug._id }})">
+  <tr @click="getBugById(bug.id)">
     <th class="text-center">
       {{ bug.title }}
     </th>
@@ -21,6 +21,7 @@
 
 <script>
 import { router } from '../router'
+import { bugsService } from '../services/BugsService'
 
 export default {
   name: 'Bug',
@@ -34,6 +35,9 @@ export default {
       dateFormat(date) {
         const timeBreak = date.split('T', 1).join().split('-').sort().join('/')
         return timeBreak
+      },
+      async getBugById(id) {
+        await bugsService.getBugById(id)
       }
     }
   }

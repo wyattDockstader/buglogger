@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { computed, reactive, watchEffect } from '@vue/runtime-core'
+import { computed, reactive, onMounted } from '@vue/runtime-core'
 import { AppState } from '../AppState'
 import { bugsService } from '../services/BugsService'
 export default {
@@ -51,7 +51,7 @@ export default {
         description: ''
       }
     })
-    watchEffect(async() => {
+    onMounted(async() => {
       await bugsService.getBugs()
     })
     return {

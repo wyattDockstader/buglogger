@@ -18,5 +18,9 @@ class NotesService {
     const res = await api.post('api/notes', newNote)
     logger.log(res.data)
   }
+
+  async deleteNote(id) {
+    await api.delete('api/notes', id)
+  }
 }
 export const notesService = new NotesService()

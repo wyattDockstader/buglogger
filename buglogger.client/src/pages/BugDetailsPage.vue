@@ -1,60 +1,67 @@
 <template>
-  <div class="bugDetailsPage container-fluid">
-    <div class="row d-flex justify-content-around">
-      <div class="col-lg-8 d-flex flex-column">
-        <h1>{{ bug.title }}</h1>
-        <p>Reported By: {{ bug.creator.name }}</p>
-      </div>
-      <div class="col-lg-2 d-flex flex-column">
-        <button v-if="bug.closed == false" class="btn btn-danger mt-3 mb-3" @click="closeBug">
-          Close Bug
-        </button>
-        <div class="d-flex align-items-center">
-          <p>status:</p>
-          <h3>{{ isClosed(bug.closed) }}</h3>
+  <div v-if="bug == null">
+    Loading ....
+  </div>
+  <div v-else>
+    <div class="bugDetailsPage container-fluid">
+      <div class="row d-flex justify-content-around">
+        <div class="col-lg-8 d-flex flex-column">
+          <h1>{{ bug.title }}</h1>
+          <p>Reported By: {{ bug.creator.name }}</p>
         </div>
-      </div>
-    </div>
-    <div class="row d-flex justify-content-center">
-      <div class="col-11 border border-primary">
-        <p>{{ bug.description }}</p>
-      </div>
-    </div>
-    <div class="row d-flex justify-content-center">
-      <div class="col-11 d-flex mt-5 mb-2">
-        <h2>Notes</h2>
-        <div class="dropdown">
-          <button class="btn btn-success dropdown-toggle"
-                  type="button"
-                  id="dropdownMenu2"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-          >
-            Add Note
+        <div class="col-lg-2 d-flex flex-column">
+          <button v-if="bug.closed == false" class="btn btn-danger mt-3 mb-3" @click="closeBug">
+            Close Bug
           </button>
-          <form class="dropdown-menu p-4" @submit.prevent="createNote">
-            <div class="form-group">
-              <label class="sr-only" for="Note">Message</label>
-              <input type="text" class="form-control" v-model="state.newNote.body" placeholder="Note" required>
-            </div>
-            <button type="submit" class="btn btn-primary">
-              Add This Note!
-            </button>
-          </form>
+          <div class="d-flex align-items-center">
+            <p>status:</p>
+            <h3>{{ isClosed(bug.closed) }}</h3>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row d-flex justify-content-center">
-      <div class="col-11">
-        <table style="width: 90vw">
-          <tr>
-            <th>Name</th>
-            <th>Message</th>
-            <th>Delete</th>
-          </tr>
-          <Note v-for="note in notes" :key="note.id" :note="note" />
-        </table>
+      <div class="row d-flex justify-content-center">
+        <div class="col-11 border border-primary">
+          <p>{{ bug.description }}</p>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center">
+        <div class="col-11 d-flex mt-5 mb-2">
+          <h2>Notes</h2>
+          <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle"
+                    type="button"
+                    id="dropdownMenu2"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+            >
+              Add Note
+            </button>
+            <form class="dropdown-menu p-4" @submit.prevent="createNote">
+              <div class="form-group">
+                <label class="sr-only" for="Note">Message</label>
+                <input type="text" class="form-control" v-model="state.newNote.body" placeholder="Note" required>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Add This Note!
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center">
+        <div class="col-11">
+          <table style="width: 90vw">
+            <tr>
+              <th>Name</th>
+              <th>Message</th>
+              <th class="text-center">
+                Delete
+              </th>
+            </tr>
+            <Note v-for="note in notes" :key="note.id" :note="note" />
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -76,16 +83,16 @@ export default {
       }
     })
     const route = useRoute()
-    watchEffect(async() => {
-      await bugsService.getBugById(route.params.id)
-      await notesService.getNotesByBugId(route.params.id)
+    watchEffect(() => {
+      bugsService.getBugById(route.params.id)
+      notesService.getNotesByBugId(route.params.id)
     })
     return {
       state,
       bug: computed(() => AppState.activeBug),
       notes: computed(() => AppState.notes),
       isClosed(val) {
-        return val ? 'closed' : 'open'
+        return val ? 'Closed' : 'Open'
       },
       closeBug() {
         bugsService.closeBug(route.params.id)
