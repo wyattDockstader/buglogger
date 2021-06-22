@@ -23,6 +23,7 @@ class NotesService {
     return note
   }
 
+  // NOTE change to findOneAndDelete({id:id, creatorId:creatorId})
   async deleteNote(id) {
     const note = await dbContext.Note.findByIdAndDelete(id)
     return note
