@@ -10,7 +10,7 @@
       </div>
     </router-link>
     <button
-      class="navbar-toggler2"
+      class="navbar-toggler2 d-lg-none"
       type="button"
       data-toggle="collapse"
       data-target="#navbarText"
