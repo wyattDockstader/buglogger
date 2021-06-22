@@ -2,6 +2,7 @@ import { Auth0Provider } from '@bcwdev/auth0provider'
 import { notesService } from '../services/NotesService'
 import { bugsService } from '../services/BugsService'
 import BaseController from '../utils/BaseController'
+import { BadRequest } from '../utils/Errors'
 
 export class NotesController extends BaseController {
   constructor() {
@@ -14,15 +15,16 @@ export class NotesController extends BaseController {
   }
 
   async editNote(req, res, next) {
-    if (req.body.closed) {
-      return res.send('Bug is closed,you cant edit')
-    } else {
-      try {
+    try {
+      const bug = await bugsService.filterBug(req.body.bug)
+      if (bug.closed === true) {
+        throw new BadRequest('Bug is closed,you cant edit note')
+      } else {
         const note = await notesService.editNote(req.params.id, req.body)
         return res.send(note)
-      } catch (error) {
-        next(error)
       }
+    } catch (error) {
+      next(error)
     }
   }
 
@@ -30,7 +32,9 @@ export class NotesController extends BaseController {
     req.body.creatorId = req.account.id
     try {
       const bug = await bugsService.getBugById(req.body.bug)
-      if (bug.closed === false) {
+      if (bug.closed === true) {
+        throw new BadRequest('Bug is closed,you cant create a note')
+      } else {
         const note = await notesService.createNote(req.body)
         return res.send(note)
       }
@@ -41,8 +45,14 @@ export class NotesController extends BaseController {
 
   async deleteNote(req, res, next) {
     try {
-      const note = await notesService.deleteNote(req.params.id)
-      return res.send(note)
+      const dNote = await notesService.getNoteById(req.params.id)
+      const bug = await bugsService.filterBug(dNote.bug)
+      if (bug.closed === true) {
+        throw new BadRequest('Bug is closed,you cant create a note')
+      } else {
+        const note = await notesService.deleteNote(req.params.id)
+        return res.send(note)
+      }
     } catch (error) {
       next(error)
     }

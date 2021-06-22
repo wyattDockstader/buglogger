@@ -6,13 +6,42 @@
     <div class="bugDetailsPage container-fluid">
       <div class="row d-flex justify-content-around">
         <div class="col-lg-8 d-flex flex-column">
-          <h1>{{ bug.title }}</h1>
+          <h1 class="mt-3">
+            {{ bug.title }}
+          </h1>
           <p>Reported By: {{ bug.creator.name }}</p>
+          <div v-if="bug.closed == false" class="dropdown">
+            <button v-if="bug.creator.id === account.id"
+                    class="btn btn-success dropdown-toggle"
+                    type="button"
+                    id="dropdownMenu3"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+            >
+              Edit Bug
+            </button>
+            <form class="dropdown-menu p-4" @submit.prevent="editBug">
+              <div class="form-group">
+                <label class="sr-only" for="title">Bug Title</label>
+                <input type="text" class="form-control" v-model="state.editedBug.title" placeholder="Bug Title">
+              </div>
+              <div class="form-group">
+                <label class="sr-only" for="description">Description</label>
+                <input type="text" class="form-control" v-model="state.editedBug.description" placeholder="Description">
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Edit This Bug!
+              </button>
+            </form>
+          </div>
         </div>
         <div class="col-lg-2 d-flex flex-column">
-          <button v-if="bug.closed == false" class="btn btn-danger mt-3 mb-3" @click="closeBug">
-            Close Bug
-          </button>
+          <div v-if="bug.creator.id === account.id">
+            <button v-if="bug.closed == false" class="btn btn-danger mt-3 mb-3" @click="closeBug">
+              Close Bug
+            </button>
+          </div>
           <div class="d-flex align-items-center">
             <p>status:</p>
             <h3>{{ isClosed(bug.closed) }}</h3>
@@ -20,14 +49,14 @@
         </div>
       </div>
       <div class="row d-flex justify-content-center">
-        <div class="col-11 border border-primary">
-          <p>{{ bug.description }}</p>
-        </div>
+        <p class="p-3">
+          {{ bug.description }}
+        </p>
       </div>
       <div class="row d-flex justify-content-center">
         <div class="col-11 d-flex mt-5 mb-2">
           <h2>Notes</h2>
-          <div class="dropdown">
+          <div v-if="bug.closed == false" class="dropdown">
             <button class="btn btn-success dropdown-toggle"
                     type="button"
                     id="dropdownMenu2"
@@ -55,7 +84,7 @@
             <tr>
               <th>Name</th>
               <th>Message</th>
-              <th class="text-center">
+              <th v-if="bug.closed == false" class="text-center">
                 Delete
               </th>
             </tr>
@@ -68,22 +97,22 @@
 </template>
 
 <script>
-import { computed, reactive, watchEffect } from '@vue/runtime-core'
+import { computed, onMounted, reactive } from '@vue/runtime-core'
 import { useRoute } from 'vue-router'
 import { bugsService } from '../services/BugsService'
 import { notesService } from '../services/NotesService'
 import { AppState } from '../AppState'
+import { logger } from '../utils/Logger'
 
 export default {
   name: 'BugDetailsPage',
   setup() {
     const state = reactive({
-      newNote: {
-        body: ''
-      }
+      newNote: {},
+      editedBug: {}
     })
     const route = useRoute()
-    watchEffect(() => {
+    onMounted(() => {
       bugsService.getBugById(route.params.id)
       notesService.getNotesByBugId(route.params.id)
     })
@@ -91,15 +120,22 @@ export default {
       state,
       bug: computed(() => AppState.activeBug),
       notes: computed(() => AppState.notes),
+      account: computed(() => AppState.account),
       isClosed(val) {
         return val ? 'Closed' : 'Open'
       },
       closeBug() {
-        bugsService.closeBug(route.params.id)
+        if (confirm('Do you really want to close this Bug ??')) { bugsService.closeBug(route.params.id) }
       },
       createNote() {
         state.newNote.bug = route.params.id
         notesService.createNote(state.newNote)
+        state.newNote = {}
+      },
+      editBug() {
+        logger.log(route.params.id, state.editedBug)
+        bugsService.editBug(route.params.id, state.editedBug)
+        state.editedBug = {}
       }
     }
   }
@@ -109,7 +145,6 @@ export default {
 
 <style lang="scss" scoped>
 table {
-  font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
 }

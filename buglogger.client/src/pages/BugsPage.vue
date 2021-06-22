@@ -1,6 +1,6 @@
 <template>
-  <div class="BugsPage m-3">
-    <div class="dropdown">
+  <div v-if="user.isAuthenticated" class="BugsPage m-3">
+    <div class="">
       <button class="btn btn-success dropdown-toggle"
               type="button"
               id="dropdownMenu2"
@@ -28,7 +28,7 @@
       <tr>
         <th>Title</th>
         <th>Reported by</th>
-        <th class="mdi mdi-sort">
+        <th class="mdi mdi-sort" @click="sortBugs()">
           Status
         </th>
         <th>Last reported on</th>
@@ -57,19 +57,28 @@ export default {
     return {
       state,
       bugs: computed(() => AppState.bugs),
+      user: computed(() => AppState.user),
       async createBug() {
         await bugsService.createBug(state.newBug)
+        state.newBug = ''
+      },
+      sortBugs() {
+        if (AppState.bugs[0].closed) {
+          const bugList = AppState.bugs.sort((a, b) => { if (a.closed < b.closed) { return -1 } if (a.closed > b.closed) { return 1 } return 0 })
+          AppState.bugs = bugList
+        } else {
+          const utterBugList = AppState.bugs.sort((a, b) => { if (a.closed < b.closed) { return 1 } if (a.closed > b.closed) { return -1 } return 0 })
+          AppState.bugs = utterBugList
+        }
       }
 
     }
-  },
-  components: {}
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 table {
-  font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
 }

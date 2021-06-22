@@ -13,18 +13,19 @@ class BugsService {
   }
 
   async createBug(newBug) {
+    delete newBug.closed
     const bug = await dbContext.Bug.create(newBug)
     await bug.populate('creator', 'name picture').execPopulate()
     return bug
   }
 
-  async filterBug(id, newBug) {
-    delete newBug.closed
+  async filterBug(id) {
     const bug = await dbContext.Bug.findById(id)
     return bug
   }
 
   async editBug(id, newBug) {
+    delete newBug.closed
     const bug = await dbContext.Bug.findByIdAndUpdate(id, newBug)
     await bug.populate('creator', 'name picture').execPopulate()
     return bug
@@ -32,6 +33,7 @@ class BugsService {
 
   async changeStatus(id) {
     const bug = await dbContext.Bug.findByIdAndUpdate(id, { closed: true }, { new: true, runValidators: true })
+    await bug.populate('creator', 'name picture').execPopulate()
     return bug
   }
 }

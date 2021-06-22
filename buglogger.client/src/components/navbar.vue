@@ -10,7 +10,7 @@
       </div>
     </router-link>
     <button
-      class="navbar-toggler"
+      class="navbar-toggler2"
       type="button"
       data-toggle="collapse"
       data-target="#navbarText"
@@ -18,12 +18,12 @@
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon" />
+      <span class="navbar-toggler-icon " />
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link :to="{ name: 'Bugs' }" class="nav-link">
+        <li v-if="user.isAuthenticated" class="nav-item">
+          <router-link :to="{ name: 'Bugs' }" class="text-dark">
             Bug List
           </router-link>
         </li>
@@ -119,4 +119,14 @@ a:hover {
 .nav-item .nav-link.router-link-exact-active{
   color: var(--primary);
 }
+.navbar-toggler2 {
+  color: black;
+  padding: 0.25rem 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  border: 1px solid grey;
+  border-radius: 0.25rem;
+  background-color: black;
+}
+
 </style>

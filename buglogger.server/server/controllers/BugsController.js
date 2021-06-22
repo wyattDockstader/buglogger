@@ -2,6 +2,7 @@ import { Auth0Provider } from '@bcwdev/auth0provider'
 import { bugsService } from '../services/BugsService'
 import { notesService } from '../services/NotesService'
 import BaseController from '../utils/BaseController'
+import { BadRequest } from '../utils/Errors'
 
 export class BugsController extends BaseController {
   constructor() {
@@ -55,8 +56,10 @@ export class BugsController extends BaseController {
 
   async editBug(req, res, next) {
     try {
-      const bug = await bugsService.filterBug(req.params.id, req.body)
-      if (bug.closed === false) {
+      const bug = await bugsService.filterBug(req.params.id)
+      if (bug.closed === true) {
+        throw new BadRequest('Bug is closed,you cant edit bug')
+      } else {
         const fBug = await bugsService.editBug(req.params.id, req.body)
         return res.send(fBug)
       }
@@ -67,8 +70,13 @@ export class BugsController extends BaseController {
 
   async changeStatus(req, res, next) {
     try {
-      const bug = await bugsService.changeStatus(req.params.id)
-      return res.send(bug)
+      const bug = await bugsService.filterBug(req.params.id)
+      if (bug.closed === true) {
+        throw new BadRequest('You cant close a bug thats already closed')
+      } else {
+        const bug = await bugsService.changeStatus(req.params.id)
+        return res.send(bug)
+      }
     } catch (error) {
       next(error)
     }

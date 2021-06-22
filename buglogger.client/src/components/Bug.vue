@@ -33,8 +33,9 @@ export default {
         return val ? 'closed' : 'open'
       },
       dateFormat(date) {
-        const timeBreak = date.split('T', 1).join().split('-').sort().join('/')
-        return timeBreak
+        const timeBreak = date.split('T', 1).join().split('-')
+        const fDate = timeBreak[1] + '/' + timeBreak[2] + '/' + timeBreak[0]
+        return fDate
       },
       async getBugById(id) {
         await bugsService.getBugById(id)
@@ -47,6 +48,6 @@ export default {
 <style lang="scss" scoped>
 .closed {
   text-decoration: line-through ;
-  color: red;
+  color: rgb(155, 28, 28);
 }
 </style>

@@ -8,10 +8,12 @@
       {{ note.body }}
     </th>
     <th class="d-flex justify-content-center align-items-center">
-      <button v-if="note.creator.id == account.id" class="btn btn-danger mdi mdi-trash-can-outline text-light" @click="deleteNote()"></button>
-      <span v-else>
-        Not your note
-      </span>
+      <div v-if="bug.closed == false">
+        <button v-if="note.creator.id == account.id" class="btn btn-danger mdi mdi-trash-can-outline text-light" @click="deleteNote(note.id)"></button>
+        <span v-else>
+          Not your note
+        </span>
+      </div>
     </th>
   </tr>
 </template>
@@ -28,8 +30,9 @@ export default {
   setup(props) {
     return {
       account: computed(() => AppState.account),
-      deleteNote() {
-        if (confirm('Do you really want to delete this Note ??')) { notesService.deleteNote(props.note.id) }
+      bug: computed(() => AppState.activeBug),
+      deleteNote(id) {
+        if (confirm('Do you really want to delete this Note ??')) { notesService.deleteNote(id) }
       }
     }
   }

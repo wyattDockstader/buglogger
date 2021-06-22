@@ -6,6 +6,11 @@ class NotesService {
     return notes
   }
 
+  async getNoteById(id) {
+    const note = await dbContext.Note.findById(id)
+    return note
+  }
+
   async createNote(newNote) {
     const note = await dbContext.Note.create(newNote)
     await note.populate('creator', 'name picture').execPopulate()
